@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM eclipse-temurin:8-jdk
 WORKDIR /app
 run mkdir -p src/main/webapp/resources target
 COPY src/main/webapp/* /app/src/main/webapp/
