@@ -52,30 +52,38 @@ pipeline {
 
         stage('Run Containers') {
             steps {
+                sh '''
+                echo "Removing old containers..."
+                docker stop backend || true
+                docker rm backend || true
 
-                sh 'docker rm -f backend || true'
-                sh 'docker rm -f frontend || true'
+                docker stop frontend || true
+                docker rm frontend || true
 
-                sh 'docker run -d --name backend -p 8085:8080 $DOCKER_USER/backend-app:v2'
+                echo "Starting backend container..."
+                docker run -d --name backend -p 8085:8080 $DOCKER_USER/backend-app:v2
 
-                sh 'docker run -d -p 8084:8080 -e BACKEND=http://localhost:8085 --name frontend $DOCKER_USER/frontend-app:v2'
+                echo "Starting frontend container..."
+                docker run -d --name frontend -p 8084:8080 -e BACKEND=http://localhost:8085 $DOCKER_USER/frontend-app:v2
+                '''
             }
         }
-       stage('Verify Application') {
-    steps {
-        sh '''
-        echo "Waiting for application to start..."
-        sleep 15
 
-        echo "Checking Backend..."
-        curl -I http://localhost:8085 || exit 1
+        stage('Verify Application') {
+            steps {
+                sh '''
+                echo "Waiting for application to start..."
+                sleep 15
 
-        echo "Checking Frontend..."
-        curl -I http://localhost:8084 || exit 1
+                echo "Checking Backend..."
+                curl -I http://localhost:8085 || exit 1
 
-        echo "Both services are running successfully!"
-        '''
-    }
-}
+                echo "Checking Frontend..."
+                curl -I http://localhost:8084 || exit 1
+
+                echo "Both services are running successfully!"
+                '''
+            }
+        }
     }
 }
