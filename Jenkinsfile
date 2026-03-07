@@ -70,20 +70,27 @@ pipeline {
         }
 
         stage('Verify Application') {
-            steps {
-                sh '''
-                echo "Waiting for application to start..."
-                sleep 15
+    steps {
+        sh '''
+        echo "Checking Backend..."
+        for i in {1..10}
+        do
+            curl -I http://localhost:8085 && break
+            echo "Backend not ready yet... retrying"
+            sleep 5
+        done
 
-                echo "Checking Backend..."
-                curl -I http://localhost:8085 || exit 1
+        echo "Checking Frontend..."
+        for i in {1..10}
+        do
+            curl -I http://localhost:8084 && break
+            echo "Frontend not ready yet... retrying"
+            sleep 5
+        done
 
-                echo "Checking Frontend..."
-                curl -I http://localhost:8084 || exit 1
-
-                echo "Both services are running successfully!"
-                '''
-            }
-        }
+        echo "Both Backend and Frontend are running successfully!"
+        '''
+    }
+}
     }
 }
