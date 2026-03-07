@@ -61,18 +61,21 @@ pipeline {
                 sh 'docker run -d -p 8084:8080 -e BACKEND=http://localhost:8085 --name frontend $DOCKER_USER/frontend-app:v2'
             }
         }
-        stage('Verify Application') {
-            steps {
-            sh '''
-                echo "Checking Backend..."
-                curl -I http://localhost:8085 || exit 1
+       stage('Verify Application') {
+    steps {
+        sh '''
+        echo "Waiting for application to start..."
+        sleep 15
 
-                echo "Checking Frontend..."
-                curl -I http://localhost:8084 || exit 1
+        echo "Checking Backend..."
+        curl -I http://localhost:8085 || exit 1
 
-                echo "Both Backend and Frontend are running successfully!"
-                '''
-            }
-        }
+        echo "Checking Frontend..."
+        curl -I http://localhost:8084 || exit 1
+
+        echo "Both services are running successfully!"
+        '''
+    }
+}
     }
 }
