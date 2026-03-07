@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM eclipse-temurin:8-jdk
 WORKDIR /app
-COPY target/backend-1.0-RELEASE.jar /app/backend.jar
-CMD java -jar backend.jar
+COPY target/*.jar backend.jar
+ENTRYPOINT ["java","-jar","backend.jar"]
